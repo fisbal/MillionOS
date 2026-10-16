@@ -1,5 +1,5 @@
 // MillionOS offline worker: the game works without a connection after the first visit.
-const CACHE = "millionos-v1";
+const CACHE = "millionos-v2";
 const CORE = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
 self.addEventListener("install", e => {

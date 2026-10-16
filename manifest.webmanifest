@@ -1,7 +1,7 @@
 {
   "name": "MillionOS",
   "short_name": "MillionOS",
-  "description": "Bilingual naval knowledge challenge: climb from Sailor to Admiral.",
+  "description": "Bilingual CAF knowledge challenge: Navy, Army, Air Force careers.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
