@@ -1,0 +1,25 @@
+MillionOS — version web autonome (GitHub Pages)
+================================================
+
+Fichiers
+  index.html              Le jeu complet (images officielles intégrées, musique originale)
+  manifest.webmanifest    Permet d'installer le jeu comme une application
+  sw.js                   Fonctionne hors ligne après la première visite
+  icon-192.png, icon-512.png, icon-maskable-512.png   Icônes
+
+Publier sur GitHub Pages (comme NavalOS)
+  1. Créer un dépôt public, par ex. « millionos », sur le compte fisbal.
+  2. Téléverser les 6 fichiers à la racine du dépôt.
+  3. Settings → Pages → Source : « Deploy from a branch », branche « main », dossier « / (root) ».
+  4. Après 1 à 2 minutes : https://fisbal.github.io/millionos/
+
+Installer sur téléphone ou tablette
+  Ouvrir le lien dans Chrome → menu ⋮ → « Ajouter à l'écran d'accueil » / « Installer l'application ».
+
+Mise à jour
+  Remplacer index.html dans le dépôt. Pour forcer les appareils à recharger l'icône
+  et les fichiers en cache, changer CACHE = "millionos-v1" en "millionos-v2" dans sw.js.
+
+Note
+  Jeu de pratique non officiel. Non affilié aux Forces armées canadiennes.
+  Questions tirées d'information publique seulement. Images : canada.ca (Défense nationale).
