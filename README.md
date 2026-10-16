@@ -2,7 +2,7 @@
 
 Bilingual (EN/FR) naval knowledge challenge: climb 15 ranks from Sailor to Admiral and earn 1,000,000 points.
 
-**Play:** https://fisbal.github.io/millionos/
+**Play:** https://fisbal.github.io/MillionOS/
 
 - 140 questions: rank insignia, Army equivalents, fleet and frigate badges, seamanship, Navy and Canadian military history
 - Official insignia and ship images from canada.ca (National Defence)

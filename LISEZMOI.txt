@@ -8,10 +8,10 @@ Fichiers
   icon-192.png, icon-512.png, icon-maskable-512.png   Icônes
 
 Publier sur GitHub Pages (comme NavalOS)
-  1. Créer un dépôt public, par ex. « millionos », sur le compte fisbal.
+  1. Créer un dépôt public, par ex. « MillionOS », sur le compte fisbal.
   2. Téléverser les 6 fichiers à la racine du dépôt.
   3. Settings → Pages → Source : « Deploy from a branch », branche « main », dossier « / (root) ».
-  4. Après 1 à 2 minutes : https://fisbal.github.io/millionos/
+  4. Après 1 à 2 minutes : https://fisbal.github.io/MillionOS/
 
 Installer sur téléphone ou tablette
   Ouvrir le lien dans Chrome → menu ⋮ → « Ajouter à l'écran d'accueil » / « Installer l'application ».
