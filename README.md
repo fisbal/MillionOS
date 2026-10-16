@@ -10,7 +10,7 @@ Bilingual (EN/FR) Canadian Armed Forces knowledge challenge. Enlist in the Navy,
 - Official insignia and ship images from canada.ca (National Defence)
 - Lifelines: Direct order (50:50), Call the watch, Crew vote, Change of watch
 - 30-second timer from question 6, explanation after every answer
-- 7 original music styles generated live (Naval, Pop, Gospel, R&B, Classical, Modern Arabic, Asian) and sound effects
+- 8 music styles generated live (Naval, Pop, Gospel, R&B, Classical, Spanish, Modern Arabic, Asian), 5 rotating pieces each: famous public-domain melodies newly arranged, plus original pieces
 - Installable on phone or tablet, works offline after the first visit
 
 Unofficial practice game. Not affiliated with or endorsed by the Canadian Armed Forces. Questions use public information only and do not replace your course or manuals.
