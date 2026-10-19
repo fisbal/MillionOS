@@ -1,0 +1,131 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Capacitor deps
+        working-directory: capacitor
+        run: npm install
+
+      - name: Generate native Android project
+        working-directory: capacitor
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Build debug APK
+        working-directory: capacitor/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp capacitor/android/app/build/outputs/apk/debug/app-debug.apk out/AlphaOmega-android.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: out/AlphaOmega-android.apk
+
+  windows:
+    name: Windows EXE
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Electron deps
+        working-directory: electron
+        run: npm install
+
+      - name: Build Windows installer
+        working-directory: electron
+        run: npx electron-builder --win nsis --x64
+
+      - name: Collect EXE
+        shell: bash
+        run: |
+          mkdir -p out
+          cp electron/dist/*.exe out/AlphaOmega-windows-setup.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: out/AlphaOmega-windows-setup.exe
+
+  web:
+    name: Deploy web (GitHub Pages)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish app/ to gh-pages
+        run: |
+          mkdir -p /tmp/pages
+          cp -r app/* /tmp/pages/
+          cd /tmp/pages
+          git init -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy Alpha & Omega web build"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Publish rolling release
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-build
+          path: out
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: out
+
+      - name: Publish rolling "latest" release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Alpha & Omega — latest build
+          prerelease: true
+          make_latest: false
+          body: |
+            Automatically rebuilt from the latest push to `main`.
+
+            - Windows: download `AlphaOmega-windows-setup.exe` below and run it.
+            - Android: download `AlphaOmega-android.apk` below and install it (allow "install from unknown sources" if asked).
+            - Any phone, tablet, or computer: open https://${{ github.repository_owner }}.github.io/alpha-omega/ — it also installs itself as an app from the browser's "Install app" / "Add to Home Screen" option.
+          files: |
+            out/AlphaOmega-android.apk
+            out/AlphaOmega-windows-setup.exe
