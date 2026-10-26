@@ -13,6 +13,7 @@
       {
         "label": "main",
         "title": "MillionOS",
+        "zoomHotkeysEnabled": true,
         "width": 1100,
         "height": 820,
         "minWidth": 320,
