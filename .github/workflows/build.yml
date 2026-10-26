@@ -112,7 +112,7 @@ jobs:
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
-            npx tauri build --ci --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}"
+            npx tauri build --ci --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
           else
             echo "::warning::TAURI_SIGNING_PRIVATE_KEY is not set; this build cannot update installed apps."
             npx tauri build --ci --config '{"bundle":{"createUpdaterArtifacts":false}}'
@@ -159,7 +159,7 @@ jobs:
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
-            npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}"
+            npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
           else
             npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config '{"bundle":{"createUpdaterArtifacts":false}}'
           fi
