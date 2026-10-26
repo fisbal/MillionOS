@@ -108,7 +108,12 @@ jobs:
           TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
         run: |
           # Secrets pasted by hand often carry a stray line break or space, which breaks the update key.
-          export TAURI_SIGNING_PRIVATE_KEY="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          K="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          # Keep only the key itself, even if a title line was pasted with it, then fix its = padding.
+          K2="$(printf %s "$K" | grep -oE 'dW50cnVzdGVk[A-Za-z0-9+/]+' | head -1 || true)"
+          if [ -n "$K2" ]; then K="$K2"; while [ $(( ${#K} % 4 )) -ne 0 ]; do K="$K="; done; fi
+          echo "::notice title=Update key::${#K} characters, starts right: $(case "$K" in dW50cnVzdGVk*) echo yes;; *) echo no;; esac)"
+          export TAURI_SIGNING_PRIVATE_KEY="$K"
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
@@ -154,8 +159,14 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
         run: |
+          set -o pipefail
           # Secrets pasted by hand often carry a stray line break or space, which breaks the update key.
-          export TAURI_SIGNING_PRIVATE_KEY="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          K="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          # Keep only the key itself, even if a title line was pasted with it, then fix its = padding.
+          K2="$(printf %s "$K" | grep -oE 'dW50cnVzdGVk[A-Za-z0-9+/]+' | head -1 || true)"
+          if [ -n "$K2" ]; then K="$K2"; while [ $(( ${#K} % 4 )) -ne 0 ]; do K="$K="; done; fi
+          echo "::notice title=Update key::${#K} characters, starts right: $(case "$K" in dW50cnVzdGVk*) echo yes;; *) echo no;; esac)"
+          export TAURI_SIGNING_PRIVATE_KEY="$K"
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
