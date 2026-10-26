@@ -24,7 +24,17 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}html{height:100%}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}html{height:100%}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}
+/* screens: the logo stays easy to tap on short screens */
+.logo{min-height:32px}
+/* Ask Claude */
+.aiRow{display:flex;gap:8px;flex-wrap:wrap}.aiRow input{flex:1 1 180px;width:auto}
+#aiKey,#aiQ{background:var(--abyss);border:1px solid var(--rivet);border-radius:10px;padding:10px 12px;color:var(--foam);font:inherit;font-size:16px}
+#aiQ{width:100%;resize:vertical;box-sizing:border-box}
+#aiOut{white-space:pre-wrap;max-height:40vh;overflow:auto;line-height:1.45}
+#aiOut:empty{display:none}
+#aiOut .q{color:var(--brass);display:block;margin-bottom:6px}
+</style>
 </head>
 <body>
 
@@ -284,6 +294,7 @@ input[type=text]{font-family:var(--f-mono);font-size:16px;text-transform:upperca
     <div class="tools">
       <button class="chip" id="btnMusic" type="button"></button>
       <button class="chip" id="btnFull" type="button" aria-label="Full screen" title="Full screen">⛶</button>
+      <button class="chip" id="btnClaude" type="button" aria-label="Ask Claude" title="Ask Claude">✦</button>
       <button class="chip" id="btnSettings" type="button" aria-label="Settings">⚙</button>
       <button class="chip" id="langEN" type="button">EN</button>
       <button class="chip" id="langFR" type="button">FR</button>
@@ -419,6 +430,13 @@ input[type=text]{font-family:var(--f-mono);font-size:16px;text-transform:upperca
   <button class="b3d steel" id="btnReenlist" type="button"></button>
   <div class="row" id="reConfirm" hidden><button class="b3d" id="btnReYes" type="button"></button><button class="b3d steel" id="btnReNo" type="button"></button></div>
   <button class="b3d" id="btnSetClose" type="button"></button></div></div>
+<div class="overlay" id="ovClaude" hidden><div class="sheet"><h2 id="aiH"></h2>
+  <p class="muted" id="aiP"></p>
+  <div id="aiKeyRow" class="aiRow"><input type="password" id="aiKey" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"><button class="b3d" id="btnAiKey" type="button"></button></div>
+  <div id="aiOut" aria-live="polite"></div>
+  <div id="aiAskRow"><textarea id="aiQ" rows="2"></textarea>
+  <div class="row"><button class="b3d" id="btnAiAsk" type="button"></button><button class="b3d steel" id="btnAiForget" type="button"></button></div></div>
+  <button class="b3d steel" id="btnAiClose" type="button"></button></div></div>
 <div class="overlay" id="ovPromo" hidden><div class="sheet promo" id="promoSheet"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -974,6 +992,54 @@ $("ladBtn").onclick=()=>{$("drawer").hidden=false};$("btnCloseDrawer").onclick=(
     x.fillStyle="#eaf0f8";for(let i=0;i<4;i++){const t=i*Math.PI/2+Math.PI/4;x.beginPath();x.moveTo(C+Math.cos(t)*52,C+Math.sin(t)*52);x.lineTo(C+Math.cos(t+.6)*12,C+Math.sin(t+.6)*12);x.lineTo(C,C);x.lineTo(C+Math.cos(t-.6)*12,C+Math.sin(t-.6)*12);x.closePath();x.fill()}
     x.fillStyle="#070e1e";x.beginPath();x.arc(C,C,8,0,7);x.fill();x.strokeStyle="#d6ab52";x.lineWidth=2;x.stroke();
     a+=still?.008:.025;requestAnimationFrame(draw)}draw()})();
+
+
+/* ======================= ASK CLAUDE ======================= */
+/* A coach that explains questions, ranks and answers. It uses the player's own Claude key,
+   kept in this browser only, and the official SDK bundled in vendor/. */
+const AI_KEY="millionos-claude-key",AI_MODEL="claude-opus-5-5";
+const AIT=(en,fr)=>ST.lang==="fr"?fr:en;
+const aiKey=()=>{try{return localStorage.getItem(AI_KEY)||""}catch(e){return ""}};
+let AI_TURNS=[],AI_BUSY=null;
+function aiScreen(){
+  if(!$("scrGame").hidden&&G){const ans=[...document.querySelectorAll("#answers button")].map(b=>b.textContent.trim()).join(" | ");
+    const learn=$("learn")&&!$("learn").hidden?$("learn").textContent.trim():"";
+    return `The player is on a question (${G.mode==="ladder"?"career game":"training"}${G.locked?", already answered":", not answered yet"}).\nQuestion: ${$("qText").textContent.trim()}\nChoices: ${ans}${learn?"\nExplanation shown: "+learn:""}`}
+  const c=career();return c?`The player is on the home screen. Career: ${$("cRank")?$("cRank").textContent.trim():""}.`:"The player is on the home screen and has not enlisted yet."}
+function renderAI(){const k=!!aiKey();
+  $("aiH").textContent=AIT("✦ Ask Claude","✦ Demander à Claude");
+  $("aiP").textContent=k?AIT("Ask about a question, a rank, an insignia or a ship. During a career game Claude gives hints until you answer.","Posez une question sur une question du jeu, un grade, un insigne ou un navire. Pendant une partie de carrière, Claude donne des indices jusqu'à ce que vous répondiez.")
+    :AIT("Claude can explain every question and correct your mistakes. It uses your own Claude key from console.anthropic.com, which stays on this device only.","Claude peut expliquer chaque question et corriger vos erreurs. Il utilise votre propre clé Claude (console.anthropic.com), qui reste sur cet appareil seulement.");
+  $("aiKeyRow").hidden=k;$("aiAskRow").hidden=!k;
+  $("btnAiKey").textContent=AIT("Turn on","Activer");$("btnAiAsk").textContent=AIT("Ask","Demander");
+  $("btnAiForget").textContent=AIT("Forget my key","Oublier ma clé");$("btnAiClose").textContent=L().close;
+  $("aiQ").placeholder=AIT("Why is this the right answer?","Pourquoi est-ce la bonne réponse ?")}
+function openCopilot(){renderAI();$("ovClaude").hidden=false}
+async function askAI(){const q=$("aiQ").value.trim();if(!q||AI_BUSY||!aiKey())return;
+  $("aiQ").value="";const out=$("aiOut");out.innerHTML="";const qe=document.createElement("span");qe.className="q";qe.textContent=q;const ae=document.createElement("span");ae.textContent=AIT("Claude is thinking…","Claude réfléchit…");out.append(qe,ae);
+  AI_TURNS.push({role:"user",content:q});AI_TURNS=AI_TURNS.slice(-12);
+  const system=`You are the coach inside MillionOS, an unofficial bilingual quiz game about the Canadian Armed Forces (Navy, Army, Air Force, ranks, drill, dress, history, seamanship). Explain clearly and correct mistakes kindly. If the player has not answered a career-game question yet, give a hint, not the answer. Use public information only and say when the player should check their course material. Keep answers under 150 words. Answer in ${ST.lang==="fr"?"Canadian French":"English"}.\n\n${aiScreen()}`;
+  AI_BUSY=new AbortController();$("btnAiAsk").disabled=true;
+  try{const {default:Anthropic}=await import("./vendor/anthropic-sdk.mjs");
+    // The key is the player's own and stays in this browser, so calling the API from the page is intended.
+    const client=new Anthropic({apiKey:aiKey(),dangerouslyAllowBrowser:true});
+    let text="";const st=client.messages.stream({model:AI_MODEL,max_tokens:1024,system,messages:AI_TURNS},{signal:AI_BUSY.signal});
+    st.on("text",d=>{text+=d;ae.textContent=text});
+    const fin=await st.finalMessage();
+    text=fin.content.map(b=>b.type==="text"?b.text:"").join("");
+    if(fin.stop_reason==="refusal"||!text){AI_TURNS.pop();ae.textContent=AIT("Claude could not answer that one. Try asking another way.","Claude n'a pas pu répondre. Essayez de formuler autrement.")}
+    else{ae.textContent=text;AI_TURNS.push({role:"assistant",content:text})}}
+  catch(e){AI_TURNS.pop();const s=e&&e.status;
+    if(e&&e.name==="APIUserAbortError")ae.textContent="";
+    else if(s===401||s===403){try{localStorage.removeItem(AI_KEY)}catch(_){}ae.textContent=AIT("This key was not accepted. Paste a new one.","Cette clé n'a pas été acceptée. Collez-en une nouvelle.");renderAI()}
+    else if(s===429||s===529)ae.textContent=AIT("Claude is busy right now. Wait a moment and try again.","Claude est occupé. Attendez un instant et réessayez.");
+    else ae.textContent=AIT("Claude could not answer. Check your connection and try again.","Claude n'a pas pu répondre. Vérifiez votre connexion et réessayez.")}
+  finally{AI_BUSY=null;$("btnAiAsk").disabled=false}}
+$("btnClaude").onclick=openCopilot;
+$("btnAiKey").onclick=()=>{const v=$("aiKey").value.trim();if(!v)return;try{localStorage.setItem(AI_KEY,v)}catch(e){}$("aiKey").value="";renderAI();$("aiQ").focus()};
+$("btnAiForget").onclick=()=>{try{localStorage.removeItem(AI_KEY)}catch(e){}AI_TURNS=[];$("aiOut").innerHTML="";renderAI()};
+$("btnAiAsk").onclick=askAI;$("aiQ").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askAI()}});
+$("btnAiClose").onclick=()=>{if(AI_BUSY)AI_BUSY.abort();$("ovClaude").hidden=true};
 
 applyLang();show("scrHome");setTab("career");
 </script>

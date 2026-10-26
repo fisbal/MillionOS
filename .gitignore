@@ -1,0 +1,11 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+*.jks
+node_modules/
+src-tauri/target/
+src-tauri/gen/
+screens/
+dist/
