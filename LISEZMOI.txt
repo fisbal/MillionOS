@@ -13,6 +13,10 @@ Publier sur GitHub Pages (comme NavalOS)
   3. Settings → Pages → Source : « Deploy from a branch », branche « main », dossier « / (root) ».
   4. Après 1 à 2 minutes : https://fisbal.github.io/MillionOS/
 
+Apps (Android, Windows, Mac)
+  https://github.com/fisbal/MillionOS/releases/latest : MillionOS.apk, MillionOS-Setup.exe, MillionOS.dmg.
+  Elles se mettent à jour seules. Chaque modification sur main publie une nouvelle version.
+
 Installer sur téléphone ou tablette
   Ouvrir le lien dans Chrome → menu ⋮ → « Ajouter à l'écran d'accueil » / « Installer l'application ».
 

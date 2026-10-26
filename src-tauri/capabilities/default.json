@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "MillionOS needs nothing from the app beyond showing its page; updates run on the Rust side.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

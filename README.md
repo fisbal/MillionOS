@@ -12,6 +12,16 @@ Bilingual (EN/FR) Canadian Armed Forces knowledge challenge. Enlist in the Navy,
 - 30-second timer from question 6, explanation after every answer
 - 8 music styles generated live (Naval, Pop, Gospel, R&B, Classical, Spanish, Modern Arabic, Asian), 5 rotating pieces each: famous public-domain melodies newly arranged, plus original pieces
 - Installable on phone or tablet, works offline after the first visit
+- ✦ Ask Claude: a coach that explains questions and corrects mistakes (hints only during a career game), with your own Claude key kept on the device
+
+## Apps
+Every push to `main` builds and publishes a Release with **MillionOS.apk** (Android), **MillionOS-Setup.exe** / **.msi** (Windows), **MillionOS.dmg** (Mac) and the source code: https://github.com/fisbal/MillionOS/releases/latest
+
+Installed apps update themselves (Windows and Mac install the new version and reopen; Android offers it). Every pull request checks each screen on phones, tablets, PC and Mac in English and French (`npm run check:screens`).
+
+- `android/` Android app (WebView of the site), signed with the key in the `MILLIONOS_KEYSTORE_B64` / `MILLIONOS_KEYSTORE_PASSWORD` secrets
+- `src-tauri/` Windows and Mac apps (Tauri), signed updates with the `TAURI_SIGNING_*` secrets
+- `.github/workflows/build.yml` builds and releases all of them
 
 Unofficial practice game. Not affiliated with or endorsed by the Canadian Armed Forces. Questions use public information only and do not replace your course or manuals.
 

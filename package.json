@@ -1,50 +1,15 @@
 {
-  "name": "alpha-omega-desktop",
-  "version": "1.0.0",
+  "name": "millionos",
   "private": true,
-  "description": "Alpha & Omega — New Testament Study (Windows desktop wrapper)",
-  "main": "main.js",
-  "author": "Martin B",
+  "version": "1.0.0",
+  "description": "MillionOS: Canadian Armed Forces knowledge challenge, for the web, Android, Windows and Mac",
   "scripts": {
-    "start": "electron .",
-    "dist": "electron-builder"
+    "tauri": "tauri",
+    "dist": "node scripts/make-dist.mjs",
+    "check:screens": "node scripts/check-screens.mjs . screens"
   },
   "devDependencies": {
-    "electron": "^31.0.0",
-    "electron-builder": "^24.13.3"
-  },
-  "build": {
-    "appId": "com.martinb.alphaomega",
-    "productName": "Alpha & Omega",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "main.js",
-      "preload.js"
-    ],
-    "extraResources": [
-      {
-        "from": "../app",
-        "to": "app",
-        "filter": ["**/*"]
-      }
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "../app/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "Alpha & Omega"
-    }
+    "@tauri-apps/cli": "^2.12.4",
+    "playwright": "1.48.2"
   }
 }
