@@ -120,6 +120,8 @@ jobs:
           [ -n "$P" ] || P="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           echo "::notice title=Update key password::${#P} characters (expected 20)"
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$P"
+          # Short fingerprints (not the values) so a wrong paste can be named.
+          echo "::notice title=Fingerprints::key $(printf %s "$K" | sha256sum | cut -c1-8), password $(printf %s "$P" | sha256sum | cut -c1-8)"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
             npx tauri build --ci --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
@@ -178,6 +180,8 @@ jobs:
           [ -n "$P" ] || P="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
           echo "::notice title=Update key password::${#P} characters (expected 20)"
           export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$P"
+          # Short fingerprints (not the values) so a wrong paste can be named.
+          echo "::notice title=Fingerprints::key $(printf %s "$K" | sha256sum | cut -c1-8), password $(printf %s "$P" | sha256sum | cut -c1-8)"
           export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
             npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
