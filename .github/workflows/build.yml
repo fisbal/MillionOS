@@ -107,8 +107,24 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
         run: |
+          # Secrets pasted by hand often carry a stray line break or space, which breaks the update key.
+          K="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          # Keep only the key itself, even if a title line was pasted with it, then fix its = padding.
+          K2="$(printf %s "$K" | grep -oE 'dW50cnVzdGVk[A-Za-z0-9+/]+' | head -1 || true)"
+          if [ -n "$K2" ]; then K="$K2"; while [ $(( ${#K} % 4 )) -ne 0 ]; do K="$K="; done; fi
+          OK=no; case "$K" in dW50cnVzdGVk*) OK=yes;; esac
+          echo "::notice title=Update key::${#K} characters (expected 348), starts right: $OK"
+          export TAURI_SIGNING_PRIVATE_KEY="$K"
+          # Same for the password: skip any title line pasted with it.
+          P="$(printf '%s\n' "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | grep -vE '^[[:space:]]*$|=====|NAME:' | head -1 | tr -d '[:space:]' || true)"
+          [ -n "$P" ] || P="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
+          echo "::notice title=Update key password::${#P} characters (expected 20)"
+          export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$P"
+          # Short fingerprints (not the values) so a wrong paste can be named.
+          echo "::notice title=Fingerprints::key $(printf %s "$K" | sha256sum | cut -c1-8), password $(printf %s "$P" | sha256sum | cut -c1-8)"
+          export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
-            npx tauri build --ci --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}"
+            npx tauri build --ci --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
           else
             echo "::warning::TAURI_SIGNING_PRIVATE_KEY is not set; this build cannot update installed apps."
             npx tauri build --ci --config '{"bundle":{"createUpdaterArtifacts":false}}'
@@ -150,8 +166,25 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
         run: |
+          set -o pipefail
+          # Secrets pasted by hand often carry a stray line break or space, which breaks the update key.
+          K="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY" | tr -d '[:space:]')"
+          # Keep only the key itself, even if a title line was pasted with it, then fix its = padding.
+          K2="$(printf %s "$K" | grep -oE 'dW50cnVzdGVk[A-Za-z0-9+/]+' | head -1 || true)"
+          if [ -n "$K2" ]; then K="$K2"; while [ $(( ${#K} % 4 )) -ne 0 ]; do K="$K="; done; fi
+          OK=no; case "$K" in dW50cnVzdGVk*) OK=yes;; esac
+          echo "::notice title=Update key::${#K} characters (expected 348), starts right: $OK"
+          export TAURI_SIGNING_PRIVATE_KEY="$K"
+          # Same for the password: skip any title line pasted with it.
+          P="$(printf '%s\n' "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | grep -vE '^[[:space:]]*$|=====|NAME:' | head -1 | tr -d '[:space:]' || true)"
+          [ -n "$P" ] || P="$(printf %s "$TAURI_SIGNING_PRIVATE_KEY_PASSWORD" | tr -d '[:space:]')"
+          echo "::notice title=Update key password::${#P} characters (expected 20)"
+          export TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$P"
+          # Short fingerprints (not the values) so a wrong paste can be named.
+          echo "::notice title=Fingerprints::key $(printf %s "$K" | sha256sum | cut -c1-8), password $(printf %s "$P" | sha256sum | cut -c1-8)"
+          export TAURI_SIGNING_PUBLIC_KEY="$(printf %s "$TAURI_SIGNING_PUBLIC_KEY" | tr -d '[:space:]')"
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -n "$TAURI_SIGNING_PUBLIC_KEY" ]; then
-            npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}"
+            npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config "{\"plugins\":{\"updater\":{\"pubkey\":\"$TAURI_SIGNING_PUBLIC_KEY\"}}}" 2>&1 | tee tauri.log || { grep -iE "error|failed|invalid|password" tauri.log | tail -15 | sed 's/^/::error title=Tauri build::/'; exit 1; }
           else
             npx tauri build --ci --target universal-apple-darwin --bundles app,dmg --config '{"bundle":{"createUpdaterArtifacts":false}}'
           fi
