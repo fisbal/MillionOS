@@ -56,7 +56,10 @@
   "plugins": {
     "updater": {
       "pubkey": "SET_BY_CI_FROM_THE_TAURI_SIGNING_PUBLIC_KEY_SECRET",
-      "endpoints": ["https://github.com/fisbal/MillionOS/releases/latest/download/latest.json"],
+      "endpoints": [
+        "https://fisbal.github.io/updates/millionos/latest.json",
+        "https://github.com/fisbal/MillionOS/releases/latest/download/latest.json"
+      ],
       "windows": { "installMode": "passive" }
     }
   }

@@ -85,6 +85,8 @@ jobs:
           path: out/*
 
   windows:
+    # Mac/Windows minutes cost 10x/2x on a private repo: build them only for a release, not for every PR.
+    if: github.event_name != 'pull_request'
     name: Windows app
     runs-on: windows-latest
     steps:
@@ -144,6 +146,8 @@ jobs:
           path: out/*
 
   mac:
+    # Mac/Windows minutes cost 10x/2x on a private repo: build them only for a release, not for every PR.
+    if: github.event_name != 'pull_request'
     name: Mac app
     runs-on: macos-latest
     steps:
