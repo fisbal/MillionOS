@@ -4,7 +4,7 @@ Bilingual (EN/FR) Canadian Armed Forces knowledge challenge. Enlist in the Navy,
 
 **Play:** https://fisbal.github.io/MillionOS/
 
-- 944 questions in 10 categories (Navy, Army, Air Force, Ranks, Equivalents, Drill, Inspection & dress, History, OREN lessons, Seamanship) and 4 difficulty levels
+- 1,325 questions in 14 categories (Navy, Army, Air Force, Ranks, Equivalents, Drill, Inspection & dress, History, OREN lessons, Seamanship, C7A2 rifle, First aid, Compass, Workbook & safety) and 4 difficulty levels
 - Career mode with merit points and promotion boards; Training mode by category; Review of your mistakes (spaced repetition)
 - Achievements and per-category mastery
 - Official insignia and ship images from canada.ca (National Defence)
