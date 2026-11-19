@@ -156,7 +156,8 @@ input[type=text]{font-family:var(--f-mono);font-size:16px;text-transform:upperca
 .disc{font-size:11px;color:var(--mist);text-align:center;max-width:90ch;margin:0 auto}
 
 /* ---------- game ---------- */
-.game{display:grid;gap:var(--gap);grid-template-columns:1fr;overflow:hidden}
+/* The game fits one screen when it can; when the answer and its explanation are taller than the screen, it scrolls. */
+.game{display:grid;gap:var(--gap);grid-template-columns:1fr;overflow-x:hidden;overflow-y:auto}
 .stage{display:flex;flex-direction:column;gap:var(--gap);min-width:0;min-height:0}
 .status{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .rankNow{font-family:var(--f-display);font-size:clamp(15px,2.5vh,18px);letter-spacing:.04em;text-transform:uppercase;color:var(--mist);min-width:0}
@@ -586,7 +587,7 @@ function startPractice(cat){
 }
 const curQ=()=>G.seq[G.i];
 function answers(q){return q.a}
-function loadQ(){stopTimer();G.order4=shuffle([0,1,2,3]);G.hidden=new Set();G.sel=null;G.locked=false;$("msg").hidden=true;$("learn").hidden=true;
+function loadQ(){stopTimer();$("scrGame").scrollTop=0;G.order4=shuffle([0,1,2,3]);G.hidden=new Set();G.sel=null;G.locked=false;$("msg").hidden=true;$("learn").hidden=true;
   Sound.level(G.mode==="ladder"?G.i:3);renderGame();if(G.mode==="ladder")startTimer()}
 function renderGame(){
   const q=curQ(),t=L(),A=answers(q),lad=G.mode==="ladder";
@@ -656,7 +657,9 @@ function reveal(res){
   const why=q.e?tx(q.e):"";
   box.innerHTML=`<div class="lt"><p><span class="cheer">${esc(cheer)}</span> ${t.isAns} <b>${rightTxt}</b>.</p>${why?`<p class="why">${esc(why)}</p>`:""}</div><button class="b3d" id="btnNext" type="button">${label}</button>`;
   box.hidden=false;$("lifes").hidden=true;$("msg").hidden=true;
-  const nb=$("btnNext");nb.onclick=()=>{nb.disabled=true;
+  const nb=$("btnNext");
+  // On a short screen the explanation and the Next button can sit below the fold: bring them into view.
+  requestAnimationFrame(()=>{const g=$("scrGame");if(g.scrollHeight>g.clientHeight+2)g.scrollTo({top:g.scrollHeight,behavior:"smooth"})});nb.onclick=()=>{nb.disabled=true;
     if(G.mode==="ladder"){if(ok){G.i++;if(G.i===15)finish("win");else loadQ()}else finish("lost")}
     else{if(last)finish("practice");else{G.i++;loadQ()}}};
   try{nb.focus({preventScroll:true})}catch(e){}
